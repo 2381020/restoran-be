@@ -1,54 +1,38 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { UserService } from '../user/user.service';
-import { User } from '../user/user.entity';
-import { RegisterDTO } from './dto/register.dto';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { JwtPayloadDto } from './dto/jwt-payload.dto';
+import { JwtService } from '@nestjs/jwt';   // tambahkan ini!
+import { User } from '../user/user.entity';
+import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private jwtService: JwtService,
-    private userService: UserService,
+    @InjectRepository(User)
+    private readonly userRepo: Repository<User>,
+    private readonly jwtService: JwtService   // injeksi JwtService di sini!
   ) {}
 
-  async signIn(email: string, password: string) {
-    const user: User | null = await this.userService.findByEmail(email);
-    if (
-      user == null ||
-      email != user.email ||
-      !bcrypt.compareSync(password, user?.password_hash)
-    ) {
-      throw new UnauthorizedException();
-    }
-    const payload: JwtPayloadDto = { sub: user.id, email: user.email };
-    return {
-      access_token: await this.jwtService.signAsync(payload),
-    };
+  async register(dto: RegisterDto): Promise<User> {
+    const exists = await this.userRepo.findOneBy({ email: dto.email });
+    if (exists) throw new UnauthorizedException('Email sudah terdaftar');
+    
+    const hash = await bcrypt.hash(dto.password, 10);
+    const user = this.userRepo.create({ ...dto, password: hash });
+
+    return this.userRepo.save(user);
   }
 
-  async register(registerDto: RegisterDTO) {
-    const existedUser: User | null =
-      await this.userService.findByEmailOrUsername(
-        registerDto.email,
-        registerDto.username,
-      );
-    if (existedUser) {
-      throw new HttpException(
-        'Email or username already exists',
-        HttpStatus.CONFLICT,
-      );
+  async login(dto: LoginDto): Promise<{ access_token: string }> {
+    const user = await this.userRepo.findOneBy({ email: dto.email });
+
+    if (!user || !(await bcrypt.compare(dto.password, user.password))) {
+      throw new UnauthorizedException('Email atau password salah');
     }
-    const user: User = new User();
-    user.email = registerDto.email;
-    user.username = registerDto.username;
-    user.password_hash = bcrypt.hashSync(registerDto.password, 10);
-    await this.userService.save(user);
+
+    const payload = { sub: user.id, username: user.username };
+    return { access_token: await this.jwtService.signAsync(payload) };
   }
 }

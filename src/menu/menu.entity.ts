@@ -1,16 +1,16 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity()
-export class User {
+export class Menu {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true })
-  email: string;
+  @Column()
+  name: string;
+
+  @Column('decimal', { precision: 10, scale: 2 })
+  price: number;
 
   @Column()
-  username: string;
-
-  @Column()
-  password: string; // <== penting!
+  description: string;
 }

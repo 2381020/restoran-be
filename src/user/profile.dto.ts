@@ -1,18 +1,5 @@
-import { ApiProperty } from "@nestjs/swagger";
-
-export class ProfileDTO {
-  @ApiProperty()
+export interface ProfileDto {
+  id: number;
   username: string;
-
-  @ApiProperty()
   email: string;
-
-  @ApiProperty()
-  bio: string;
-
-  @ApiProperty()
-  created_at: Date;
-
-  @ApiProperty()
-  updated_at: Date;
 }

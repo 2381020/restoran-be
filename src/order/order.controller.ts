@@ -1,22 +1,22 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+// src/order/order.controller.ts
+import { Controller, Post, Body, Param, Get } from '@nestjs/common';
 import { OrderService } from './order.service';
+import { CreateOrderDto } from './create-order.dto';
 
-@Controller('order')
-export class OrderController { // Ensure that OrderController is being exported
+@Controller('order') // Pastikan path sesuai dengan yang diminta
+export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
-  @Get()
-  findAll() {
-    return this.orderService.findAll();
+  @Post(':userId') // Route untuk membuat pesanan berdasarkan userId
+  async createOrder(
+    @Param('userId') userId: number, // Menangkap userId dari URL
+    @Body() createOrderDto: CreateOrderDto,
+  ) {
+    return this.orderService.createOrder({ ...createOrderDto, userId });
   }
 
-  @Post()
-  create(@Body() data: any) {
-    return this.orderService.create(data);
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.orderService.findOne(id);
+  @Get(':userId')
+  async findOrdersByUser(@Param('userId') userId: number) {
+    return this.orderService.findOrdersByUser(userId);
   }
 }

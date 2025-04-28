@@ -1,16 +1,46 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+// src/user/user.entity.ts
+import { Cart } from 'src/cart/cart.entity';
+import { Order } from 'src/order/order.entity'; // <-- pastikan Order diimpor dengan benar
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
-@Entity()
+@Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
-
-  @Column({ unique: true })
-  email: string;
 
   @Column()
   username: string;
 
   @Column()
-  password: string; // <== penting!
+  email: string;
+
+  @Column()
+  password_hash: string;
+
+  @Column()
+  profile_picture: string;
+
+  @Column()
+  bio: string;
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
+
+  // Relasi ke Cart
+  @OneToMany(() => Cart, (cart) => cart.user)
+  carts: Cart[];
+
+  // Relasi ke Order
+  @OneToMany(() => Order, (order) => order.user)
+  orders: Order[]; // <-- relasi ke entitas Order
 }

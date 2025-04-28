@@ -1,21 +1,18 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
+import { LoginDTO } from './dto/login.dto';
+import { RegisterDTO } from './dto/register.dto';
 import { AuthService } from './auth.service';
-import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/login.dto';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
-
-  // Rute untuk Register
-  @Post('register')
-  async register(@Body() registerDto: RegisterDto) {
-    return this.authService.register(registerDto);
+  constructor(private authService: AuthService) {}
+  @Post('login')
+  signIn(@Body() signInDto: LoginDTO) {
+    return this.authService.signIn(signInDto.email, signInDto.password);
   }
 
-  // Rute untuk Login
-  @Post('login')
-  async login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+  @Post('register')
+  register(@Body() registerDto: RegisterDTO) {
+    return this.authService.register(registerDto);
   }
 }

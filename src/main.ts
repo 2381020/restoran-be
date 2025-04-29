@@ -8,6 +8,12 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.enableCors();
 
+   // Tambahkan middleware untuk set header Allow-Private-Network
+   app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Private-Network', 'true');
+    next();
+  });
+
   const config = new DocumentBuilder()
     .setTitle('Simple Social Media API')
     .addBearerAuth()

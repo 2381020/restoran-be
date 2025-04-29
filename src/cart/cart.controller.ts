@@ -1,39 +1,46 @@
 // src/cart/cart.controller.ts
-import { Controller, Post, Body, Get, Param, Patch, Delete } from '@nestjs/common';
+import { UseGuards, Request, Controller, Post, Body, Get, Param, Patch, Delete } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { CreateCartDto } from './create-cart.dto';
 import { UpdateCartDto } from './update-cart.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('cart')
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
   @Post()
-  async create(@Body() createCartDto: CreateCartDto) {
-    const cart = await this.cartService.create(createCartDto);
+  async create(@Request() req, @Body() createCartDto: CreateCartDto) {
+    const userId = req.user.id;
+    const cart = await this.cartService.create({ ...createCartDto, userId });
     return { message: 'Item berhasil ditambahkan ke keranjang', data: cart };
   }
 
-  @Get(':userId')
-  async findByUser(@Param('userId') userId: number) {
+  @Get()
+  async findByUser(@Request() req) {
+    const userId = req.user.id;
     const carts = await this.cartService.findByUser(userId);
     return { message: 'Daftar keranjang', data: carts };
   }
 
   @Patch()
-  async updateQuantity(@Body() updateCartDto: UpdateCartDto) {
-    const updated = await this.cartService.updateQuantity(updateCartDto);
+  async updateQuantity(@Request() req, @Body() updateCartDto: UpdateCartDto) {
+    const userId = req.user.id;
+    const updated = await this.cartService.updateQuantity({ ...updateCartDto, userId });
     return { message: 'Quantity berhasil diperbarui', data: updated };
   }
 
-  @Delete(':userId/:menuId')
-  async remove(@Param('userId') userId: number, @Param('menuId') menuId: number) {
+  @Delete(':menuId')
+  async remove(@Request() req, @Param('menuId') menuId: number) {
+    const userId = req.user.id;
     await this.cartService.remove(userId, menuId);
     return { message: 'Item berhasil dihapus dari keranjang' };
   }
 
-  @Delete('clear/:userId')
-  async clearCart(@Param('userId') userId: number) {
+  @Delete('clear/all')
+  async clearCart(@Request() req) {
+    const userId = req.user.id;
     await this.cartService.clearCart(userId);
     return { message: 'Semua item di keranjang berhasil dihapus' };
   }

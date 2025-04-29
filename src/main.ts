@@ -8,12 +8,12 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.enableCors({
     origin: 'https://restoran-fe.vercel.app', // ganti dengan domain frontend kamu
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   });
   
-
+  
    // Tambahkan middleware untuk set header Allow-Private-Network
    app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Private-Network', 'true');

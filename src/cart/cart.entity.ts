@@ -10,10 +10,10 @@ export class Cart {
   @Column()
   quantity: number;
 
-  @ManyToOne(() => Menu, (menu) => menu.carts, { eager: false })
+  @ManyToOne(() => Menu, (menu) => menu.carts)
   menu: Menu;
 
-  @ManyToOne(() => User, (user) => user.carts, { eager: false })
+  @ManyToOne(() => User, (user) => user.carts)
   user: User;
 
   @Column()

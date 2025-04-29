@@ -21,9 +21,4 @@ export class CreateMenuDto {
   @IsString()
   @IsNotEmpty()
   imageUrl: string;
-
-  @ApiProperty({ example: 1 })
-  @IsNumber()
-  @IsPositive()
-  restaurantId: number;
 }

@@ -1,23 +1,22 @@
 // src/order/order.controller.ts
-import { UseGuards, Request, Controller, Post, Body, Param, Get } from '@nestjs/common';
+import { Controller, Post, Body, Param, Get } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './create-order.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
-@UseGuards(JwtAuthGuard)
-@Controller('order')
+@Controller('order') // Pastikan path sesuai dengan yang diminta
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
-  @Post()
-  async createOrder(@Request() req, @Body() createOrderDto: CreateOrderDto) {
-    const userId = req.user.id;
+  @Post(':userId') // Route untuk membuat pesanan berdasarkan userId
+  async createOrder(
+    @Param('userId') userId: number, // Menangkap userId dari URL
+    @Body() createOrderDto: CreateOrderDto,
+  ) {
     return this.orderService.createOrder({ ...createOrderDto, userId });
   }
 
-  @Get()
-  async findOrdersByUser(@Request() req) {
-    const userId = req.user.id;
+  @Get(':userId')
+  async findOrdersByUser(@Param('userId') userId: number) {
     return this.orderService.findOrdersByUser(userId);
   }
 }

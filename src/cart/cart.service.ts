@@ -1,15 +1,10 @@
-import {
-  Injectable,
-  BadRequestException,
-  NotFoundException,
-} from '@nestjs/common';
+// src/cart/cart.service.ts
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Cart } from './cart.entity';
 import { CreateCartDto } from './create-cart.dto';
 import { UpdateCartDto } from './update-cart.dto';
-
-type CreateCartInput = Omit<CreateCartDto, 'userId'> & { userId: number };
 
 @Injectable()
 export class CartService {
@@ -18,8 +13,8 @@ export class CartService {
     private cartRepository: Repository<Cart>,
   ) {}
 
-  async create(data: CreateCartInput): Promise<Cart> {
-    const { quantity, menuId, userId } = data;
+  async create(createCartDto: CreateCartDto): Promise<Cart> {
+    const { quantity, menuId, userId } = createCartDto;
 
     if (!menuId || !userId) {
       throw new BadRequestException('menuId dan userId wajib diisi.');

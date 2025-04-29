@@ -12,6 +12,7 @@ export class CartController {
 
   @Post()
   async create(@Request() req, @Body() createCartDto: CreateCartDto) {
+    console.log('createCartDto:', createCartDto);
     const userId = req.user.id;
     const cart = await this.cartService.create({ ...createCartDto, userId });
     return { message: 'Item berhasil ditambahkan ke keranjang', data: cart };
